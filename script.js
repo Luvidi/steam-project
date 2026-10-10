@@ -1,11 +1,11 @@
-const SIZE = 8;
+const SIZE = 6;
 
 // 0 = empty
-// 1 = Player 1
-// 2 = Player 2
+// -1 = Player 1
+// 1 = Player 2
 let board;
 
-let player = 1;
+let player = -1;
 let gameOver = false;
 
 function resetGame() {
@@ -14,11 +14,11 @@ function resetGame() {
         () => Array(SIZE).fill(0)
     );
 
-    board[0][0] = 1;
+    board[0][0] = -1;
 
-    board[SIZE - 1][SIZE - 1] = 2;
+    board[SIZE - 1][SIZE - 1] = 1;
 
-    player = 1;
+    player = -1;
     gameOver = false;
 
     render();
@@ -40,10 +40,10 @@ function render() {
 
             cell.className = "cell";
 
-            if (board[row][col] === 1) {
+            if (board[row][col] === -1) {
                 cell.classList.add("player1");
             }
-            else if (board[row][col] === 2) {
+            else if (board[row][col] === 1) {
                 cell.classList.add("player2");
             }
 
@@ -102,7 +102,22 @@ function makeMove(row, col) {
     checkGameOver();
 
     if (!gameOver) {
-        player = 3 - player;
+        let found = false;
+        for (let row = 0; row < SIZE; row++) {
+            for (let col = 0; col < SIZE; col++) {
+                if (board[row][col] === -player) {
+                    if(countAdj(row, col, 0)){
+                        found = true;
+                    }
+                }
+            }
+        }
+        
+        if (found) {
+            player = -player;
+        }
+
+
     }
 
     render();
@@ -118,7 +133,7 @@ function resolveConversions() {
 
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
-                if (board[row][col] !== 3 - player) {
+                if (board[row][col] !== -player) {
                     continue;
                 }
 
@@ -149,21 +164,15 @@ function resolveConversions() {
 }
 
 function checkGameOver() {
-    let player1 = 0;
-    let player2 = 0;
+    let ss=0;
     let empty = 0;
 
     for (let row = 0; row < SIZE; row++) {
         for (let col = 0; col < SIZE; col++) {
-
-            if (board[row][col] === 1) {
-                player1++;
-            }
-            else if (board[row][col] === 2) {
-                player2++;
-            }
-            else {
+            if (board[row][col] === 0) {
                 empty++;
+            }else{
+                ss+=board[row][col];
             }
         }
     }
@@ -171,10 +180,10 @@ function checkGameOver() {
     if (empty === 0) {
         gameOver = true;
 
-        if (player1 > player2) {
+        if (ss < 0) {
             alert("Player 1 wins!");
         }
-        else if (player2 > player1) {
+        else if (ss > 0) {
             alert("Player 2 wins!");
         }
         else {
@@ -192,11 +201,11 @@ function updateInfo() {
     for (let row = 0; row < SIZE; row++) {
         for (let col = 0; col < SIZE; col++) {
 
-            if (board[row][col] === 1) {
+            if (board[row][col] === -1) {
                 player1++;
             }
 
-            if (board[row][col] === 2) {
+            if (board[row][col] === 1) {
                 player2++;
             }
         }
