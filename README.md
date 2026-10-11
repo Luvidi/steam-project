@@ -1,1 +1,3 @@
-# steam-project
+# Territory Game
+
+![Gameplay](gameplay.png)
