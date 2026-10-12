@@ -171,10 +171,12 @@ function makeMove(row, col) {
         player = -player;
     }
 
-    render();
-
     if (!gameOver && mode==1 && botSide==player) {
         botTurn();
+    }
+
+    if (!(mode==1 && botSide==player)) {
+        render();
     }
 }
 
