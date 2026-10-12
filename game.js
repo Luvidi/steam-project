@@ -77,10 +77,13 @@ function render() {
                 cell.classList.add("player2");
             }
 
-            cell.addEventListener("click", () => {
-                makeMove(row, col);
-            });
-
+            if (!board[row][col] && countAdj(row,col,player)){
+                cell.addEventListener("click", () => {
+                    makeMove(row, col);
+                });
+                cell.classList.add("active");
+            }
+            
             boardElement.appendChild(cell);
         }
     }
