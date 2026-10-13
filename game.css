@@ -75,4 +75,5 @@ button:focus-visible {
 .cell.active:hover {
     cursor: pointer;
     filter: brightness(0.9);
+    transition: filter 0.15s;
 }
