@@ -26,16 +26,24 @@ async function chooseAction(state, actions) {
     return result.action;
 }
 
-let board;
+let board, changed;
 
 let player = -1;
 let gameOver = false;
 
 const params = new URLSearchParams(window.location.search);
-const mode = params.get("mode"), botSide=params.get("bot")*2-3;
+const mode = params.get("mode"), botSide = params.get("bot") * 2 - 3;
+
+const sleep = ms =>
+    new Promise(resolve => setTimeout(resolve, ms));
 
 function resetGame() {
     board = Array.from(
+        { length: SIZE },
+        () => Array(SIZE).fill(0)
+    );
+
+    changed = Array.from(
         { length: SIZE },
         () => Array(SIZE).fill(0)
     );
@@ -49,13 +57,13 @@ function resetGame() {
 
     render();
 
-    if (mode==1 && botSide==player) {
+    if (mode == 1 && botSide == player) {
         botTurn();
     }
 }
 
 
-function render() {
+function render(isTransition = false) {
     const boardElement = document.getElementById("board");
 
     boardElement.innerHTML = "";
@@ -70,20 +78,22 @@ function render() {
 
             cell.className = "cell";
 
-            if (board[row][col] === -1) {
+            if (board[row][col] === -1 || board[row][col] === 3 && player === -1) {
                 cell.classList.add("player1");
-            }
-            else if (board[row][col] === 1) {
+            } else if (board[row][col] === 1 || board[row][col] === 3 && player === 1) {
                 cell.classList.add("player2");
             }
+            if (board[row][col] === 3) {
+                cell.classList.add("changed");
+            }
 
-            if (!board[row][col] && countAdj(row,col,player)){
+            if (!isTransition && !board[row][col] && countAdj(row, col, player)) {
                 cell.addEventListener("click", () => {
                     makeMove(row, col);
                 });
                 cell.classList.add("active");
             }
-            
+
             boardElement.appendChild(cell);
         }
     }
@@ -130,7 +140,7 @@ function getActions() {
 
     for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
-            if (!board[r][c] && countAdj(r,c,player)) {
+            if (!board[r][c] && countAdj(r, c, player)) {
                 actions.push(r * SIZE + c);
             }
         }
@@ -154,7 +164,7 @@ async function botTurn() {
 }
 
 
-function makeMove(row, col) {
+async function makeMove(row, col) {
     console.log(`Move ${row} ${col}`);
     if (gameOver || board[row][col] || !countAdj(row, col, player)) {
         console.log("Invalid");
@@ -163,19 +173,48 @@ function makeMove(row, col) {
 
     board[row][col] = 3;
 
-    resolveConversions();
+    const conversions = resolveConversions();
 
-    checkGameOver();
+    for (const conversion of conversions) {
+        board[conversion.row][conversion.col] = -player;
+    }
+
+    board[row][col] = 3;
+    render(true);
+    await sleep(200);
+
+    for (const conversion of conversions) {
+        board[conversion.row][conversion.col] = 3;
+        render(true);
+        await sleep(200);
+    }
+
+    board[row][col] = player;
+    for (const conversion of conversions) {
+        board[conversion.row][conversion.col] = player;
+    }
+
+    const conversions2 = checkGameOver();
 
     if (!gameOver) {
         player = -player;
     }
 
-    if (!gameOver && mode==1 && botSide==player) {
-        botTurn();
+    for (const conversion of conversions2) {
+        board[conversion.row][conversion.col] = 0;
     }
 
-    if (!(mode==1 && botSide==player)) {
+    for (const conversion of conversions2) {
+        board[conversion.row][conversion.col] = conversion.owner;
+        render(true);
+        await sleep(200);
+    }
+
+    if (!gameOver && mode == 1 && botSide == player) {
+        render(true);
+        await sleep(200);
+        botTurn();
+    } else {
         render();
     }
 }
@@ -183,10 +222,10 @@ function makeMove(row, col) {
 
 function resolveConversions() {
     let changed = true;
+    const conversions = [];
+
     while (changed) {
         changed = false;
-
-        const conversions = [];
 
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
@@ -200,24 +239,15 @@ function resolveConversions() {
                     conversions.push({
                         row: row,
                         col: col,
-                        newOwner: 3
                     });
+                    board[row][col] = 3;
                     changed = true;
                 }
             }
         }
+    }
 
-        for (const conversion of conversions) {
-            board[conversion.row][conversion.col] = conversion.newOwner;
-        }
-    }
-    for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
-            if (board[row][col] === 3) {
-                board[row][col] = player;
-            }
-        }
-    }
+    return conversions;
 }
 
 function checkGameOver() {
@@ -239,11 +269,18 @@ function checkGameOver() {
         }
     }
 
+    const conversions = [];
+
     if (!found1) {
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
                 if (board[row][col] === 0) {
-                    board[row][col] = 1
+                    conversions.push({
+                        row: row,
+                        col: col,
+                        owner: 1,
+                    });
+                    board[row][col] = 1;
                 }
             }
         }
@@ -253,7 +290,12 @@ function checkGameOver() {
         for (let row = 0; row < SIZE; row++) {
             for (let col = 0; col < SIZE; col++) {
                 if (board[row][col] === 0) {
-                    board[row][col] = -1
+                    conversions.push({
+                        row: row,
+                        col: col,
+                        owner: -1,
+                    });
+                    board[row][col] = -1;
                 }
             }
         }
@@ -272,11 +314,12 @@ function checkGameOver() {
     if (empty === 0) {
         gameOver = true;
     }
+
+    return conversions;
 }
 
 
 function updateInfo() {
-
     let player1 = 0;
     let player2 = 0;
 

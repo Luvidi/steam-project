@@ -53,12 +53,15 @@ button:focus-visible {
     border: none;
     border-radius: 0;
     background: #fff;
-    cursor: pointer;
     transition: background-color 0.15s;
 }
 
 .cell.player1 {
     background: #3498db;
+}
+
+.cell.changed {
+    filter: brightness(1.4);
 }
 
 .cell.player2 {
@@ -70,5 +73,6 @@ button:focus-visible {
 }
 
 .cell.active:hover {
+    cursor: pointer;
     filter: brightness(0.9);
 }
