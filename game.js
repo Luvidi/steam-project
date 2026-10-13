@@ -62,39 +62,58 @@ function resetGame() {
     }
 }
 
+const cells = [];
 
-function render(isTransition = false) {
+function initBoard() {
     const boardElement = document.getElementById("board");
-
-    boardElement.innerHTML = "";
 
     boardElement.style.gridTemplateColumns =
         `repeat(${SIZE}, 1fr)`;
 
     for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
+        cells[row] = [];
 
+        for (let col = 0; col < SIZE; col++) {
             const cell = document.createElement("div");
 
             cell.className = "cell";
 
-            if (board[row][col] === -1 || board[row][col] === 3 && player === -1) {
-                cell.classList.add("player1");
-            } else if (board[row][col] === 1 || board[row][col] === 3 && player === 1) {
-                cell.classList.add("player2");
-            }
-            if (board[row][col] === 3) {
-                cell.classList.add("changed");
-            }
+            cell.addEventListener("click", () => {
+                makeMove(row, col);
+            });
 
-            if (!isTransition && !board[row][col] && countAdj(row, col, player)) {
-                cell.addEventListener("click", () => {
-                    makeMove(row, col);
-                });
-                cell.classList.add("active");
-            }
-
+            cells[row][col] = cell;
             boardElement.appendChild(cell);
+        }
+    }
+}
+
+function render(isTransition = false) {
+    for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+            const cell = cells[row][col];
+            const value = board[row][col];
+
+            cell.className = "cell";
+
+            cell.classList.toggle(
+                "player1",
+                value === -1 || (value === 3 && player === -1)
+            );
+
+            cell.classList.toggle(
+                "player2",
+                value === 1 || (value === 3 && player === 1)
+            );
+
+            cell.classList.toggle("changed", value === 3);
+
+            const active =
+                !isTransition &&
+                value === 0 &&
+                countAdj(row, col, player);
+
+            cell.classList.toggle("active", active);
         }
     }
 
@@ -358,4 +377,5 @@ function updateInfo() {
     }
 }
 
+initBoard();
 resetGame();
