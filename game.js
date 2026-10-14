@@ -30,6 +30,7 @@ let board, changed;
 
 let player = -1;
 let gameOver = false;
+let allowMove = true;
 
 const params = new URLSearchParams(window.location.search);
 const mode = params.get("mode"), botSide = params.get("bot") * 2 - 3;
@@ -185,10 +186,11 @@ async function botTurn() {
 
 async function makeMove(row, col) {
     console.log(`Move ${row} ${col}`);
-    if (gameOver || board[row][col] || !countAdj(row, col, player)) {
+    if (gameOver || board[row][col] || !countAdj(row, col, player) || !allowMove) {
         console.log("Invalid");
         return;
     }
+    allowMove = false;
 
     board[row][col] = 3;
 
@@ -236,6 +238,8 @@ async function makeMove(row, col) {
     } else {
         render();
     }
+
+    allowMove = true;
 }
 
 
