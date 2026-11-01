@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import torch
 
-from bot import Bot1
+from bot import Bot1, Bot2
 from game import Game
 
 app = FastAPI()
@@ -22,7 +22,7 @@ class MoveRequest(BaseModel):
     player: int = Field(ge=-1, le=1)
 
 
-bot = Bot1()
+bot = Bot2()
 
 
 @app.post("/choose_action")

@@ -3,6 +3,7 @@ import torch
 from model import Model
 from game import Game
 
+
 class Bot1:
     def __init__(self):
         self.model = Model()
@@ -29,3 +30,39 @@ class Bot1:
         action = max(actions, key=lambda a: q_values[a])
 
         return int(action)
+
+
+class Bot2:
+    def __init__(self):
+        self.env = Game()
+
+    def reset(self, board, player):
+        self.env.board = board.copy()
+        self.env.player = player
+        self.env.done = False
+
+    def choose_action(self, request):
+        board = np.array(request.board, dtype=np.float32).reshape((8, 8))
+        player = request.player
+
+        self.reset(board, player)
+        actions = self.env.get_actions()
+        np.random.shuffle(actions)
+
+        best = None
+        best_score = -1e9
+
+        for action in actions:
+            self.reset(board, player)
+            self.env.move(action)
+
+            score = self.env.board.sum() * player
+
+            if self.env.done:
+                score += 100 * player
+
+            if score > best_score:
+                best_score = score
+                best = action
+
+        return int(best)
