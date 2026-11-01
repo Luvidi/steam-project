@@ -1,6 +1,7 @@
+import numpy as np
 import torch
 from model import Model
-
+from game import Game
 
 class Bot1:
     def __init__(self):
@@ -9,8 +10,12 @@ class Bot1:
             torch.load("models/model_100000.pt", weights_only=True)
         )
         self.model.eval()
+        self.env = Game()
 
     def choose_action(self, request):
+        self.env.board = np.array(request.board, dtype=np.float32).reshape((8, 8))
+        self.env.player = request.player
+
         state = torch.tensor(
                     request.board,
                     dtype=torch.float32,
@@ -19,7 +24,7 @@ class Bot1:
         with torch.no_grad():
             q_values = self.model(state).squeeze(0).cpu().numpy()
 
-        actions = request.actions
+        actions = self.env.get_actions()
 
         action = max(actions, key=lambda a: q_values[a])
 
