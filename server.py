@@ -19,7 +19,6 @@ app.add_middleware(
 
 class MoveRequest(BaseModel):
     board: list[float] = Field(min_length=64, max_length=64)
-    actions: list[int] = Field(min_length=1, max_length=64)
     player: int = Field(ge=-1, le=1)
 
 
