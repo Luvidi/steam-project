@@ -13,14 +13,14 @@ class Bot1:
         self.model.eval()
         self.env = Game()
 
-    def choose_action(self, request):
-        self.env.board = np.array(request.board, dtype=np.float32).reshape((8, 8))
-        self.env.player = request.player
+    def choose_action(self, board, player):
+        self.env.board = np.array(board, dtype=np.float32).reshape((8, 8))
+        self.env.player = player
 
         state = torch.tensor(
-                    request.board,
+                    board,
                     dtype=torch.float32,
-                ).unsqueeze(0) * request.player
+                ).unsqueeze(0) * player
 
         with torch.no_grad():
             q_values = self.model(state).squeeze(0).cpu().numpy()
@@ -41,9 +41,8 @@ class Bot2:
         self.env.player = player
         self.env.done = False
 
-    def choose_action(self, request):
-        board = np.array(request.board, dtype=np.float32).reshape((8, 8))
-        player = request.player
+    def choose_action(self, board, player):
+        board = np.array(board, dtype=np.float32).reshape((8, 8))
 
         self.reset(board, player)
         actions = self.env.get_actions()

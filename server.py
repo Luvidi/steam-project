@@ -27,7 +27,7 @@ bot = Bot2()
 
 @app.post("/choose_action")
 def choose_action(request: MoveRequest):
-    action = bot.choose_action(request)
+    action = bot.choose_action(request.board, request.player)
 
     return {
         "action": action,
