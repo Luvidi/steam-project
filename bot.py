@@ -33,8 +33,9 @@ class Bot1:
 
 
 class Bot2:
-    def __init__(self):
+    def __init__(self, shuffle=True):
         self.env = Game()
+        self.shuffle = shuffle
 
     def reset(self, board, player):
         self.env.board = board.copy()
@@ -46,7 +47,9 @@ class Bot2:
 
         self.reset(board, player)
         actions = self.env.get_actions()
-        np.random.shuffle(actions)
+        
+        if self.shuffle:
+            np.random.shuffle(actions)
 
         best = None
         best_score = -1e9
