@@ -1,6 +1,6 @@
 const SIZE = 8;
 
-async function chooseAction(state, actions) {
+async function chooseAction(board, actions, player) {
     const response = await fetch(
         "http://127.0.0.1:8000/choose_action",
         {
@@ -9,8 +9,9 @@ async function chooseAction(state, actions) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                state: state,
-                actions: actions
+                board: board,
+                actions: actions,
+                player: player
             })
         }
     );
@@ -149,10 +150,9 @@ function countAdj(row, col, player) {
     return count;
 }
 
-function getState() {
+function getBoard() {
     return board
-        .flat()
-        .map(cell => cell * player);
+        .flat();
 }
 
 function getActions() {
@@ -170,12 +170,12 @@ function getActions() {
 }
 
 async function botTurn() {
-    const state = getState();
+    const board = getBoard();
     const actions = getActions();
 
     if (actions.length === 0) return;
 
-    const action = await chooseAction(state, actions);
+    const action = await chooseAction(board, actions, player);
 
     const row = Math.floor(action / 8);
     const col = action % 8;
