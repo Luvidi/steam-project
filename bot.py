@@ -33,8 +33,9 @@ class Bot1:
 
 
 class Bot2:
-    def __init__(self, shuffle=True):
+    def __init__(self, depth=2, shuffle=False):
         self.env = Game()
+        self.depth = depth
         self.shuffle = shuffle
 
     def reset(self, board, player):
@@ -42,29 +43,46 @@ class Bot2:
         self.env.player = player
         self.env.done = False
 
-    def choose_action(self, board, player):
-        board = np.array(board, dtype=np.float32).reshape((8, 8))
+    def evaluate(self, player):
+        score = self.env.board.sum() * player
 
+        if self.env.done:
+            if score > 0:
+                score += 100
+            elif score < 0:
+                score -= 100
+
+        return score
+
+    def minimax(self, board, player, depth):
         self.reset(board, player)
+
         actions = self.env.get_actions()
-        
+
         if self.shuffle:
             np.random.shuffle(actions)
 
-        best = None
-        best_score = -1e9
+        best_action = None
+        best_score = -float("inf")
 
         for action in actions:
             self.reset(board, player)
             self.env.move(action)
 
-            score = self.env.board.sum() * player
-
-            if self.env.done:
-                score += 100 * player
+            if self.env.done or depth == 1:
+                score = self.evaluate(player)
+            else:
+                _, score = self.minimax(self.env.board.copy(), -player, depth - 1)
+                score = -score
 
             if score > best_score:
                 best_score = score
-                best = action
+                best_action = action
+        return best_action, best_score
 
-        return int(best)
+    def choose_action(self, board, player):
+        board = np.array(board, dtype=np.float32).reshape((8, 8))
+
+        best_action, _ = self.minimax(board, player, self.depth)
+
+        return int(best_action)
