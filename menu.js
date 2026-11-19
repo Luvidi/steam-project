@@ -1,0 +1,24 @@
+const startButton = document.getElementById("start");
+const warningMessage = document.getElementById("warningMessage");
+
+startButton.addEventListener("click", function() {
+
+    const player1Type = +document.getElementById("player1Type").value;
+    const player2Type = +document.getElementById("player2Type").value;
+    const boardType = document.getElementById("boardType").value;
+
+    if (player1Type && player2Type) {
+        warningMessage.classList.remove("d-none");
+        return;
+    }
+
+    warningMessage.classList.add("d-none");
+
+    const params = new URLSearchParams({
+        player1: player1Type,
+        player2: player2Type,
+        board: boardType
+    });
+
+    window.location.href = `game.html?${params.toString()}`;
+});
