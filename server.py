@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-import torch
+# import torch
 
-from bot import Bot1, Bot2
+from bot import Bot2
 from game import Game
 
 app = FastAPI()
@@ -18,7 +18,7 @@ app.add_middleware(
 
 
 class MoveRequest(BaseModel):
-    board: list[float] = Field(min_length=64, max_length=64)
+    board: list[list[float]]
     player: int = Field(ge=-1, le=1)
 
 
