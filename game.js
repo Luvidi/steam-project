@@ -211,6 +211,7 @@ async function makeMove(row, col) {
     }
 
     for (const conversion of conversions2) {
+        player = conversion.owner;
         board[conversion.row][conversion.col] = conversion.owner;
         render(true);
         await sleep(200);
@@ -225,6 +226,10 @@ async function makeMove(row, col) {
     }
 
     allowMove = true;
+
+    if (gameOver) {
+        updateInfo();
+    }
 }
 
 
@@ -352,9 +357,34 @@ function updateInfo() {
     p1Score.textContent = player1;
     p2Score.textContent = player2;
 
-    if (gameOver) {
+    if (gameOver && allowMove) {
         p1Box.classList.toggle("border-black", false);
         p2Box.classList.toggle("border-black", false);
+
+        const winnerDialog = document.getElementById("winnerDialog");
+        const winnerMessage = document.getElementById("winnerMessage");
+        const finalScore = document.getElementById("finalScore");
+
+        if (player1 > player2) {
+            p1Box.classList.add("border-success");
+            p2Box.classList.add("border-danger");
+
+            winnerMessage.textContent = "Player 1 Wins!";
+        } else if (player2 > player1) {
+            p2Box.classList.add("border-success");
+            p1Box.classList.add("border-danger");
+
+            winnerMessage.textContent = "Player 2 Wins!";
+        } else {
+            p1Box.classList.add("border-warning");
+            p2Box.classList.add("border-warning");
+
+            winnerMessage.textContent = "It's a Draw!";
+        }
+
+        finalScore.textContent = `${player1} - ${player2}`;
+
+        winnerDialog.showModal();
     }
     else {
         p1Box.classList.toggle("border-black", player == -1);
