@@ -41,7 +41,6 @@ button:focus-visible {
     display: grid;
     gap: 2px;
     width: min(90vw, 600px);
-    aspect-ratio: 1;
     border: 3px solid #555;
     background: #555;
 }
@@ -54,6 +53,7 @@ button:focus-visible {
     border-radius: 0;
     background: #fff;
     transition: background-color 0.15s;
+    aspect-ratio: 1;
 }
 
 .cell.player1 {
