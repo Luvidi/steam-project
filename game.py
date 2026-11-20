@@ -2,14 +2,15 @@ import numpy as np
 from scipy.signal import convolve2d
 
 class Game:
-    def __init__(self, size=8):
-        self.size = size
+    def __init__(self, h=8, w=8):
+        self.h = h
+        self.w = w
         self.dd = [(0, -1), (0, 1), (-1, 0), (1, 0)]
         self.nb = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
         self.reset()
 
     def reset(self):
-        self.board = np.zeros((self.size, self.size), np.float32)
+        self.board = np.zeros((self.h, self.w), np.float32)
         self.board[0, 0] = -1
         self.board[-1, -1] = 1
         self.player = -1
@@ -35,7 +36,7 @@ class Game:
             (self.board == 0)
             & (convolve2d(self.board == self.player, self.nb, mode="same") > 0)
         )
-        return self.size * rr + cc
+        return self.w * rr + cc
 
     def get_state(self):
         return (self.board * self.player).flatten().astype(np.float32)
@@ -43,12 +44,12 @@ class Game:
     def move(self, action):
         assert action in self.get_actions()
 
-        row, col = divmod(action, self.size)
+        row, col = divmod(action, self.w)
 
         self.board[row, col] = 2
 
         cnt1 = convolve2d((self.board == self.player), self.nb, mode="same")
-        cnt2 = np.zeros((self.size, self.size))
+        cnt2 = np.zeros((self.h, self.w))
 
         st = [(row, col)]
         while st:
@@ -57,9 +58,9 @@ class Game:
                 r2, c2 = r + dx, c + dy
                 if (
                     0 <= r2
-                    and r2 < self.size
+                    and r2 < self.h
                     and 0 <= c2
-                    and c2 < self.size
+                    and c2 < self.w
                     and self.board[r2, c2] == -self.player
                 ):
                     cnt2[r2, c2] += 1

@@ -1,35 +1,35 @@
 import numpy as np
-import torch
+# import torch
 from model import Model
 from game import Game
 
 
-class Bot1:
-    def __init__(self):
-        self.model = Model()
-        self.model.load_state_dict(
-            torch.load("models/model_100000.pt", weights_only=True)
-        )
-        self.model.eval()
-        self.env = Game()
+# class Bot1:
+#     def __init__(self):
+#         self.model = Model()
+#         self.model.load_state_dict(
+#             torch.load("models/model_100000.pt", weights_only=True)
+#         )
+#         self.model.eval()
+#         self.env = Game()
 
-    def choose_action(self, board, player):
-        self.env.board = np.array(board, dtype=np.float32).reshape((8, 8))
-        self.env.player = player
+#     def choose_action(self, board, player):
+#         self.env.board = np.array(board, dtype=np.float32).reshape((8, 8))
+#         self.env.player = player
 
-        state = torch.tensor(
-                    board,
-                    dtype=torch.float32,
-                ).unsqueeze(0) * player
+#         state = torch.tensor(
+#                     board,
+#                     dtype=torch.float32,
+#                 ).unsqueeze(0) * player
 
-        with torch.no_grad():
-            q_values = self.model(state).squeeze(0).cpu().numpy()
+#         with torch.no_grad():
+#             q_values = self.model(state).squeeze(0).cpu().numpy()
 
-        actions = self.env.get_actions()
+#         actions = self.env.get_actions()
 
-        action = max(actions, key=lambda a: q_values[a])
+#         action = max(actions, key=lambda a: q_values[a])
 
-        return int(action)
+#         return int(action)
 
 
 class Bot2:
@@ -39,6 +39,9 @@ class Bot2:
         self.shuffle = shuffle
 
     def reset(self, board, player):
+        h, w = board.shape
+        self.env.h = h
+        self.env.w = w
         self.env.board = board.copy()
         self.env.player = player
         self.env.done = False
@@ -81,7 +84,7 @@ class Bot2:
         return best_action, best_score
 
     def choose_action(self, board, player):
-        board = np.array(board, dtype=np.float32).reshape((8, 8))
+        board = np.array(board, dtype=np.float32)
 
         best_action, _ = self.minimax(board, player, self.depth)
 

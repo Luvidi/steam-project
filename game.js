@@ -1,4 +1,4 @@
-async function chooseAction(board, player) {
+async function chooseAction() {
     const response = await fetch(
         "http://127.0.0.1:8000/choose_action",
         {
@@ -31,7 +31,7 @@ let gameOver = false;
 let allowMove = true;
 
 const params = new URLSearchParams(window.location.search);
-const mode = params.get("mode"), botSide = params.get("bot") * 2 - 3;
+const p1Bot = +params.get("player1"), p2Bot = +params.get("player2");
 const H = +params.get("h"), W = +params.get("w");
 
 const sleep = ms =>
@@ -57,9 +57,9 @@ function resetGame() {
 
     render();
 
-    // if (mode == 1 && botSide == player) {
-    //     botTurn();
-    // }
+    if (p1Bot) {
+        botTurn();
+    }
 }
 
 const cells = [];
@@ -112,7 +112,7 @@ function render(isTransition = false) {
                 !isTransition &&
                 value === 0 &&
                 countAdj(row, col, player);
-            if (active){
+            if (active) {
                 console.log(`${row} ${col}`);
             }
             cell.classList.toggle("active", active);
@@ -157,12 +157,13 @@ function getBoard() {
 
 
 async function botTurn() {
-    const board = getBoard();
+    // const board = getBoard();
 
-    const action = await chooseAction(board, player);
+    // const action = await chooseAction(board, player);
+    const action = await chooseAction();
 
-    const row = Math.floor(action / 8);
-    const col = action % 8;
+    const row = Math.floor(action / W);
+    const col = action % W;
 
     makeMove(row, col);
 }
@@ -215,7 +216,7 @@ async function makeMove(row, col) {
         await sleep(200);
     }
 
-    if (!gameOver && mode == 1 && botSide == player) {
+    if (!gameOver&&(player==-1&&p1Bot||player==1&&p2Bot)) {
         render(true);
         await sleep(200);
         botTurn();
