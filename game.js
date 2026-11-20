@@ -1,5 +1,3 @@
-const SIZE = 8;
-
 async function chooseAction(board, player) {
     const response = await fetch(
         "http://127.0.0.1:8000/choose_action",
@@ -34,33 +32,34 @@ let allowMove = true;
 
 const params = new URLSearchParams(window.location.search);
 const mode = params.get("mode"), botSide = params.get("bot") * 2 - 3;
+const H = +params.get("h"), W = +params.get("w");
 
 const sleep = ms =>
     new Promise(resolve => setTimeout(resolve, ms));
 
 function resetGame() {
     board = Array.from(
-        { length: SIZE },
-        () => Array(SIZE).fill(0)
+        { length: H },
+        () => Array(W).fill(0)
     );
 
     changed = Array.from(
-        { length: SIZE },
-        () => Array(SIZE).fill(0)
+        { length: H },
+        () => Array(W).fill(0)
     );
 
     board[0][0] = -1;
 
-    board[SIZE - 1][SIZE - 1] = 1;
+    board[H - 1][W - 1] = 1;
 
     player = -1;
     gameOver = false;
 
     render();
 
-    if (mode == 1 && botSide == player) {
-        botTurn();
-    }
+    // if (mode == 1 && botSide == player) {
+    //     botTurn();
+    // }
 }
 
 const cells = [];
@@ -69,12 +68,12 @@ function initBoard() {
     const boardElement = document.getElementById("board");
 
     boardElement.style.gridTemplateColumns =
-        `repeat(${SIZE}, 1fr)`;
+        `repeat(${W}, 1fr)`;
 
-    for (let row = 0; row < SIZE; row++) {
+    for (let row = 0; row < H; row++) {
         cells[row] = [];
 
-        for (let col = 0; col < SIZE; col++) {
+        for (let col = 0; col < W; col++) {
             const cell = document.createElement("div");
 
             cell.className = "cell";
@@ -90,8 +89,8 @@ function initBoard() {
 }
 
 function render(isTransition = false) {
-    for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
+    for (let row = 0; row < H; row++) {
+        for (let col = 0; col < W; col++) {
             const cell = cells[row][col];
             const value = board[row][col];
 
@@ -113,7 +112,9 @@ function render(isTransition = false) {
                 !isTransition &&
                 value === 0 &&
                 countAdj(row, col, player);
-
+            if (active){
+                console.log(`${row} ${col}`);
+            }
             cell.classList.toggle("active", active);
         }
     }
@@ -137,9 +138,9 @@ function countAdj(row, col, player) {
 
         if (
             r >= 0 &&
-            r < SIZE &&
+            r < H &&
             c >= 0 &&
-            c < SIZE &&
+            c < W &&
             board[r][c] === player
         ) {
             count++;
@@ -233,8 +234,8 @@ function resolveConversions() {
     while (changed) {
         changed = false;
 
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
+        for (let row = 0; row < H; row++) {
+            for (let col = 0; col < W; col++) {
                 if (board[row][col] !== -player) {
                     continue;
                 }
@@ -261,8 +262,8 @@ function checkGameOver() {
     let empty = 0;
 
     let found1 = false, found2 = false;
-    for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
+    for (let row = 0; row < H; row++) {
+        for (let col = 0; col < W; col++) {
             if (board[row][col] === -1) {
                 if (countAdj(row, col, 0)) {
                     found1 = true;
@@ -278,8 +279,8 @@ function checkGameOver() {
     const conversions = [];
 
     if (!found1) {
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
+        for (let row = 0; row < H; row++) {
+            for (let col = 0; col < W; col++) {
                 if (board[row][col] === 0) {
                     conversions.push({
                         row: row,
@@ -293,8 +294,8 @@ function checkGameOver() {
     }
 
     if (!found2) {
-        for (let row = 0; row < SIZE; row++) {
-            for (let col = 0; col < SIZE; col++) {
+        for (let row = 0; row < H; row++) {
+            for (let col = 0; col < W; col++) {
                 if (board[row][col] === 0) {
                     conversions.push({
                         row: row,
@@ -307,8 +308,8 @@ function checkGameOver() {
         }
     }
 
-    for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
+    for (let row = 0; row < H; row++) {
+        for (let col = 0; col < W; col++) {
             if (board[row][col] === 0) {
                 empty++;
             } else {
@@ -329,8 +330,8 @@ function updateInfo() {
     let player1 = 0;
     let player2 = 0;
 
-    for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
+    for (let row = 0; row < H; row++) {
+        for (let col = 0; col < W; col++) {
 
             if (board[row][col] === -1) {
                 player1++;
