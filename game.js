@@ -67,8 +67,14 @@ const cells = [];
 function initBoard() {
     const boardElement = document.getElementById("board");
 
+    boardElement.style.setProperty("--board-height", H);
+    boardElement.style.setProperty("--board-width", W);
+
     boardElement.style.gridTemplateColumns =
-        `repeat(${W}, 1fr)`;
+        `repeat(${W}, var(--cell-size))`;
+
+    boardElement.style.gridTemplateRows =
+        `repeat(${H}, var(--cell-size))`;
 
     for (let row = 0; row < H; row++) {
         cells[row] = [];

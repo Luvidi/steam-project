@@ -5,20 +5,26 @@ body {
 #board {
     display: grid;
     gap: 2px;
-    height: 400px;
+    width: fit-content;
+    max-height: 450px;
     border: 3px solid #555;
     background: #555;
+
+    --cell-size: min(100px,
+            calc(400px / var(--board-height)),
+            calc(60vw / var(--board-width)));
+    grid-auto-rows: var(--cell-size);
+    grid-auto-columns: var(--cell-size);
 }
 
 .cell {
-    min-width: 0;
-    min-height: 0;
+    width: var(--cell-size);
+    height: var(--cell-size);
     padding: 0;
     border: none;
     border-radius: 0;
     background: #fff;
     transition: background-color 0.15s;
-    aspect-ratio: 1;
 }
 
 .cell.player1 {
