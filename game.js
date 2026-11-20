@@ -216,7 +216,7 @@ async function makeMove(row, col) {
         await sleep(200);
     }
 
-    if (!gameOver&&(player==-1&&p1Bot||player==1&&p2Bot)) {
+    if (!gameOver && (player == -1 && p1Bot || player == 1 && p2Bot)) {
         render(true);
         await sleep(200);
         botTurn();
@@ -344,25 +344,21 @@ function updateInfo() {
         }
     }
 
-    const info = document.getElementById("info");
+    const p1Score = document.getElementById("player1Score");
+    const p2Score = document.getElementById("player2Score");
+    const p1Box = document.getElementById("player1Box");
+    const p2Box = document.getElementById("player2Box");
+
+    p1Score.textContent = player1;
+    p2Score.textContent = player2;
 
     if (gameOver) {
-        info.innerHTML =
-            `Player 1: ${player1} |
-                Player 2: ${player2} | `;
-        if (player1 > player2) {
-            info.innerHTML += "Player 1 Win"
-        } else if (player1 < player2) {
-            info.innerHTML += "Player 2 Win"
-        } else {
-            info.innerHTML += "Draw"
-        }
+        p1Box.classList.toggle("border-black", false);
+        p2Box.classList.toggle("border-black", false);
     }
     else {
-        info.innerHTML =
-            `Player 1: ${player1} |
-                Player 2: ${player2} |
-                <strong>Player ${(player + 3) / 2}'s turn</strong>`;
+        p1Box.classList.toggle("border-black", player == -1);
+        p2Box.classList.toggle("border-black", player == 1);
     }
 }
 
