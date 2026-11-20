@@ -9,22 +9,13 @@ const tutorialPages = [
             </p>
         `
     },
-    // {
-    //     title: "Game Mechanics",
-    //     content: `
-    //         <h3>Expand Territory</h3>
-    //         <p>
-    //             Players take turns clicking an empty cell adjacent to their territory.
-    //         </p>
-    //     `
-    // },
     {
         title: "Game Mechanics",
         content: `
         <div class="row align-items-center g-3">
             <div class="col-7">
                 <img src="tutorial1.png"
-                     class="img-fluid rounded"
+                     class="img-fluid"
                      alt="Territory expansion example">
             </div>
 
@@ -43,8 +34,8 @@ const tutorialPages = [
         content: `
         <div class="row align-items-center g-3">
             <div class="col-7">
-                <img src="tutorial1.png"
-                     class="img-fluid rounded"
+                <img src="tutorial2.png"
+                     class="img-fluid"
                      alt="Territory expansion example">
             </div>
 
@@ -62,8 +53,8 @@ const tutorialPages = [
         content: `
         <div class="row align-items-center g-3">
             <div class="col-7">
-                <img src="tutorial1.png"
-                     class="img-fluid rounded"
+                <img src="tutorial3.png"
+                     class="img-fluid"
                      alt="Territory expansion example">
             </div>
 
